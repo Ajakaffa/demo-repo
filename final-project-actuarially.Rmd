@@ -1,0 +1,51 @@
+---
+title: "final-project-actuarially"
+output: html_document
+---
+Loading Packages
+```{r}
+library(readxl)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+claims <- read.csv("General_Analytics_Claims.csv")
+policies <- read.csv("General_Analytics_Policies.csv")
+data <- read_xlsx("General_Analytics_Data.xlsx")
+```
+
+
+Plotting Claim Severity Against Time 
+```{r}
+# Adding a claim severity column to the data frame
+
+# Creating a vector of claim counts per year starting from 2011 to 2017
+
+yearly.claim.counts <- rep(0,7)
+dates <- mdy(claims$claim_date)
+years <- year(dates)
+for (i in 1:length(years)) {
+  d <- (years[i]%%1000) - 10
+  yearly.claim.counts[d] <- yearly.claim.counts[d] + 1
+}
+
+# Arranging the data frame by date from 2011 to 2017
+
+claimsdraft <- arrange(claims, claim_date)
+
+# Calculating the claim severity 
+
+claim_severity <- 
+
+#claim_severity <- claims$claim_amount
+
+#claims <- mutate(claims, claim_severity = claim_amount/length(policy_number)) # verify formula for claim severity
+```
+
+
+```{r}
+ggplot(claims, aes(claim_data,claim_amount)) + geom_line() + scale_x_date(format=) + xlab("Date") + ylab("Claim Severity")
+```
+
