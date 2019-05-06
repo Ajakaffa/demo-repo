@@ -8,7 +8,7 @@ library(readxl)
 library(lubridate)
 library(dplyr)
 library(ggplot2)
-
+library(gridExtra)
 ```
 
 ```{r}
@@ -91,6 +91,9 @@ for (i in nonaggregated_data$policy_number) {
 location_table <- as.data.frame(table(location))
 
 #exporting the table to add to the report
+png(filename = "location_table.png", width=250, height=250, bg="white")
+grid.table(location_table)
+dev.off()
 ```
 
 
