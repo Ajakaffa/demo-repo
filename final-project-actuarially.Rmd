@@ -9,6 +9,7 @@ library(lubridate)
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
+library(dummies)
 ```
 
 ```{r}
@@ -60,6 +61,9 @@ Graph of Claims in 2017
 q <- filter(new_claims_table, claim_date==2017)
 
 #Graph of Claims in 2017
+claimsdraft <- claims
+claimsdraft$claim_date <- mdy(claimsdraft$claim_date)
+
 
 oct2017.data <- select(claimsdraft, policy_number, claim_date, claim_amount)
 oct2017.data <- filter(oct2017.data, year(claim_date)==2017)
@@ -87,7 +91,7 @@ for (i in nonaggregated_data$policy_number) {
   county.i <- policies$county[which(policies$policy_number==i)]
   location <- c(location, as.character(county.i))
 }  
-
+nonaggregated_data <- mutate(nonaggregated_data, location = location)
 location_table <- as.data.frame(table(location))
 
 #exporting the table to add to the report
@@ -96,4 +100,34 @@ grid.table(location_table)
 dev.off()
 ```
 
+Identifying correlated factors 
+```{r}
+#find which data is categorical
+sapply(policies,class)
+
+#removing catastroph data
+
+catastroph <- filter(nonaggregated_data, (location=="Napa" | location =="Solano" | location =="Sonoma"))
+
+for (pol in catastroph$policy_number) {
+  policiesdraft <- filter(policies, policy_number!= pol)
+}
+
+#transform categorical values into dummies 
+
+policiesdraft <- dummy.data.frame(policiesdraft, names = c("agency","county","construction_type", "roof_type", "construction_year","square_footage","house_value"))
+
+#Construction type and construction year 
+cor(policiesdraft[21:23],policiesdraft[28:30])
+#County and Public protection class
+cor(policiesdraft[12:20],policiesdraft[35])
+#Square Footage and House Value Year and 
+cor(policiesdraft[31:34],policiesdraft[36:40])
+#House Value and public protection class
+cor(policiesdraft[36:40],policiesdraft[35])
+#House Value and County
+cor(policiesdraft[36:40],policiesdraft[12:20])
+
+
+```
 
