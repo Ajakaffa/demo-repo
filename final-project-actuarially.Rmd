@@ -72,10 +72,14 @@ table(location)
 
 #Graph of Claims in 2017
 
-claims.2017.data <- select(claimsdraft, policy_number, claim_date, claim_amount)
-claims.2017.data <- filter(claims.2017.data, year(claim_date)==2017)
-claims.2017.data <- filter(claims.2017.data, month(claim_date)==10)
+oct2017.data <- select(claimsdraft, policy_number, claim_date, claim_amount)
+oct2017.data <- filter(oct2017.data, year(claim_date)==2017)
+oct2017.data <- filter(oct2017.data, month(claim_date)==10)
 
-ggplot(claims.2017.data) + geom_line(aes(x=,y=))
+oct2017_graph <- ggplot(oct2017.data) + geom_line(aes(x=day(claim_date),y=claim_amount)) + labs(x="Date", y="Claim Amount", title ="Claim Amounts Through October Norther California Wildfires") + theme_classic() + 
+  geom_point(aes(x=claim_amount , y = min(claim_amount), colour= "purple"), show.legend = FALSE) 
+
+
+ggsave(filename="oct2017_graph.png", width=6.5,height=5) #exporting plot to add to the report
 ```
 
