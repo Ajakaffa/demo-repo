@@ -8,6 +8,8 @@ library(readxl)
 library(lubridate)
 library(dplyr)
 library(ggplot2)
+
+setwd("/Users/AKaffa/Desktop/stat133")
 ```
 
 ```{r}
@@ -15,7 +17,6 @@ claims <- read.csv("General_Analytics_Claims.csv")
 policies <- read.csv("General_Analytics_Policies.csv")
 data <- read_xlsx("General_Analytics_Data.xlsx")
 ```
-
 
 Plotting Claim Severity Against Time 
 ```{r}
@@ -31,21 +32,50 @@ for (i in 1:length(years)) {
   yearly.claim.counts[d] <- yearly.claim.counts[d] + 1
 }
 
-# Arranging the data frame by date from 2011 to 2017
+# Calculating the severities per year group 
 
-claimsdraft <- arrange(claims, claim_date)
+claimdraft <- claims
+claimdraft$claim_date <- year(mdy(claimdraft$claim_date))
 
-# Calculating the claim severity 
-
-claim_severity <- 
-
-#claim_severity <- claims$claim_amount
-
-#claims <- mutate(claims, claim_severity = claim_amount/length(policy_number)) # verify formula for claim severity
+new_claims_table <- data.frame()
+for (year in seq(2011,2017,1)) {
+  group <- filter(claimdraft, claim_date==year)
+  count <- yearly.claim.counts[(year%%1000) - 10]
+  group <- mutate(group, individual_severity=claim_amount/count, claim_severity = sum(claim_amount)/count)
+  new_claims_table <- rbind(new_claims_table, group)
+}
 ```
 
 
 ```{r}
-ggplot(claims, aes(claim_data,claim_amount)) + geom_line() + scale_x_date(format=) + xlab("Date") + ylab("Claim Severity")
+# Generating the Plot
+
+claims_severity_plot <- ggplot(new_claims_table, aes(claim_date,claim_severity)) + theme_classic() + geom_line() + xlab("Date") + ylab("Claim Severity") + geom_point(aes(x= 2017, y = max(claim_severity), colour= "purple"), show.legend = FALSE) + ggtitle("Claim Severities over 7 Years (2012-2017)")
+
+ggsave(filename="claims_severity_plot.png", width=6.5,height=5) #exporting plot to add to the report
+```
+
+Graph of Claims in 2017
+```{r}
+
+#Getting all the locations of the claims in 2017 
+
+q <- filter(new_claims_table, claim_date==2017)
+location <- c()
+for (i in q$policy_number) {  
+  county.i <- policies$county[i]
+  location <- c(location, as.character(county.i))
+}  
+
+#Getting the number of claims per location in 2017 
+table(location)
+
+#Graph of Claims in 2017
+
+claims.2017.data <- select(claimsdraft, policy_number, claim_date, claim_amount)
+claims.2017.data <- filter(claims.2017.data, year(claim_date)==2017)
+claims.2017.data <- filter(claims.2017.data, month(claim_date)==10)
+
+ggplot(claims.2017.data) + geom_line(aes(x=,y=))
 ```
 
