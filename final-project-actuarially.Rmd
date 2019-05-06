@@ -13,9 +13,9 @@ setwd("/Users/AKaffa/Desktop/stat133")
 ```
 
 ```{r}
-claims <- read.csv("General_Analytics_Claims.csv")
-policies <- read.csv("General_Analytics_Policies.csv")
-data <- read_xlsx("General_Analytics_Data.xlsx")
+claims <- read.csv("/Users/AKaffa/Desktop/stat133/General_Analytics_Claims.csv")
+policies <- read.csv("/Users/AKaffa/Desktop/stat133/General_Analytics_Policies.csv")
+data <- read_xlsx("/Users/AKaffa/Desktop/stat133/General_Analytics_Data.xlsx")
 ```
 
 Plotting Claim Severity Against Time 
@@ -75,10 +75,12 @@ table(location)
 oct2017.data <- select(claimsdraft, policy_number, claim_date, claim_amount)
 oct2017.data <- filter(oct2017.data, year(claim_date)==2017)
 oct2017.data <- filter(oct2017.data, month(claim_date)==10)
+oct2017.data <- summarise(group_by(oct2017.data, day(claim_date)), aggregate.amount = sum(claim_amount)) # Aggregating daily claim amounts
+colnames(oct2017.data) <- c("Day", "Claim_Amount")
 
-oct2017_graph <- ggplot(oct2017.data) + geom_line(aes(x=day(claim_date),y=claim_amount)) + labs(x="Date", y="Claim Amount", title ="Claim Amounts Through October Norther California Wildfires") + theme_classic() + 
-  geom_point(aes(x=claim_amount , y = min(claim_amount), colour= "purple"), show.legend = FALSE) 
-
+oct2017_graph <- ggplot(oct2017.data) + geom_line(aes(x=Day,y=Claim_Amount)) + labs(x="Date", y="Claim Amount", title ="Claim Amounts Through October Northern California Wildfires") + theme_classic() + 
+  geom_point(aes(x=10, y = Claim_Amount[10], colour= "purple"), show.legend = FALSE) +
+ geom_point(aes(x=31, y = Claim_Amount[31], colour= "purple"), show.legend = FALSE) 
 
 ggsave(filename="oct2017_graph.png", width=6.5,height=5) #exporting plot to add to the report
 ```
