@@ -9,7 +9,6 @@ library(lubridate)
 library(dplyr)
 library(ggplot2)
 
-setwd("/Users/AKaffa/Desktop/stat133")
 ```
 
 ```{r}
@@ -58,17 +57,7 @@ ggsave(filename="claims_severity_plot.png", width=6.5,height=5) #exporting plot 
 Graph of Claims in 2017
 ```{r}
 
-#Getting all the locations of the claims in 2017 
-
 q <- filter(new_claims_table, claim_date==2017)
-location <- c()
-for (i in q$policy_number) {  
-  county.i <- policies$county[i]
-  location <- c(location, as.character(county.i))
-}  
-
-#Getting the number of claims per location in 2017 
-table(location)
 
 #Graph of Claims in 2017
 
@@ -84,4 +73,24 @@ oct2017_graph <- ggplot(oct2017.data) + geom_line(aes(x=Day,y=Claim_Amount)) + l
 
 ggsave(filename="oct2017_graph.png", width=6.5,height=5) #exporting plot to add to the report
 ```
+
+
+```{r}
+#Getting the number of claims per location in October 2017 
+
+nonaggregated_data <- select(claimsdraft, policy_number, claim_date, claim_amount)
+nonaggregated_data <- filter(nonaggregated_data, year(claim_date)==2017)
+nonaggregated_data <- filter(nonaggregated_data, month(claim_date)==10)
+
+location <- c()
+for (i in nonaggregated_data$policy_number) {  
+  county.i <- policies$county[which(policies$policy_number==i)]
+  location <- c(location, as.character(county.i))
+}  
+
+location_table <- as.data.frame(table(location))
+
+#exporting the table to add to the report
+```
+
 
